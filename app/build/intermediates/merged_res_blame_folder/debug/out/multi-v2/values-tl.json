@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-47:/values-tl/values-tl.xml",
+            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-49:/values-tl/values-tl.xml",
             "map": [
                 {
                     "source": "/home/kkrox/.gradle/caches/8.11.1/transforms/ed9384b9b1c2cbf9d8736f6bedc3db6b/transformed/core-1.13.0/res/values-tl/values-tl.xml",

@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-47:/values-hu/values-hu.xml",
+            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-49:/values-hu/values-hu.xml",
             "map": [
                 {
                     "source": "/home/kkrox/.gradle/caches/8.11.1/transforms/a5e5c0b7460b3fe5fdf45543cc446ee6/transformed/jetified-foundation-release/res/values-hu/values-hu.xml",

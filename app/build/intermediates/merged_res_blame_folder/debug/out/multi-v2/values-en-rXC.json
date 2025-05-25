@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-47:/values-en-rXC/values-en-rXC.xml",
+            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-49:/values-en-rXC/values-en-rXC.xml",
             "map": [
                 {
                     "source": "/home/kkrox/.gradle/caches/8.11.1/transforms/a53afc3502a241b0c3f3861d96bf49e3/transformed/jetified-ui-release/res/values-en-rXC/values-en-rXC.xml",

@@ -66,7 +66,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.3.0")
 
     // DataStore Preferences
-    implementation("androidx.datastore:datastore-preferences:1.1.0")
+    implementation ("androidx.datastore:datastore-preferences:1.1.7")
+
+
 
 
     // Material Icons (для звёздочек)

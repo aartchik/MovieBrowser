@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-47:/values/values.xml",
+            "outputFile": "com.example.moviebrowser.app-mergeDebugResources-49:/values/values.xml",
             "map": [
                 {
                     "source": "/home/kkrox/.gradle/caches/8.11.1/transforms/e98c6ea679f734fa23974e21158c23d5/transformed/lifecycle-viewmodel-2.7.0/res/values/values.xml",
