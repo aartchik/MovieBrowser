@@ -24,7 +24,6 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
     val uiState: StateFlow<UiState> = _ui
 
     init {
-        // Подписываемся на изменения избранного
         viewModelScope.launch {
             favRepo.favoritesFlow.collect { favs ->
                 _ui.update { it.copy(favorites = favs) }
