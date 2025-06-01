@@ -34,7 +34,6 @@ object Components {
     @Composable
     fun MovieApp(vm: MovieViewModel) {
         val state by vm.uiState.collectAsState()
-
         var showFav by remember { mutableStateOf(false) }
 
         Box(Modifier.fillMaxSize()) {
@@ -44,66 +43,56 @@ object Components {
                     .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp)
             ) {
-                // Вкладки “Search” / “Favorites”
-                TabRow(
-                    selectedTabIndex = if (showFav) 1 else 0,
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    Tab(
-                        selected = !showFav,
-                        onClick = { showFav = false },
-                        text = { Text("Search") }
-                    )
-                    Tab(
-                        selected = showFav,
-                        onClick = { showFav = true },
-                        text = { Text("Favorites") }
-                    )
+                // 1) Вкладки Search / Favorites
+                TabRow(selectedTabIndex = if (showFav) 1 else 0) {
+                    Tab(selected = !showFav, onClick = { showFav = false }) {
+                        Text("Search")
+                    }
+                    Tab(selected = showFav, onClick = { showFav = true }) {
+                        Text("Favorites")
+                    }
                 }
 
                 Spacer(Modifier.height(8.dp))
 
-                // Если режим “Search” — показываем поисковую строку
+                // 2) Поле поиска (если мы не во вкладке Favorites)
                 if (!showFav) {
                     SearchSection(vm)
                     Spacer(Modifier.height(8.dp))
                 }
 
-                // Выбираем список: либо все результаты, либо только избранные
-                val listToShow = if (showFav) {
-                    state.movies.filter { it.imdbID in state.favorites }
+                // 3) Определяем, что показывать в списке:
+                //    – если Favorites, то из state.allMovies, иначе — из state.movies
+                val listToShow: List<MovieModel> = if (showFav) {
+                    state.allMovies.filter { it.imdbID in state.favorites }
                 } else {
                     state.movies
                 }
 
-                // Основная логика состояния загрузки / ошибки / пусто
+                // 4) Логика отображения: загрузка / пусто / ошибка / сам список
                 when {
                     state.isLoading && !showFav -> {
-                        // Централизованный спиннер
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             CircularProgressIndicator()
                         }
                     }
                     showFav && listToShow.isEmpty() -> {
-                        // Сообщение о том, что избранное пусто
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text("No favorites yet.", color = Color.Gray)
                         }
                     }
                     state.error != null -> {
-                        // Текст ошибки
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Text("Error: ${state.error}", color = MaterialTheme.colorScheme.error)
                         }
                     }
                     else -> {
-                        // Список карточек фильмов
                         LazyColumn {
                             items(listToShow) { movie ->
                                 MovieItem(
-                                    movie    = movie,
-                                    isFav    = movie.imdbID in state.favorites,
-                                    onClick  = { vm.loadMovieDetails(movie.imdbID) },
+                                    movie      = movie,
+                                    isFav      = movie.imdbID in state.favorites,
+                                    onClick    = { vm.loadMovieDetails(movie.imdbID) },
                                     onFavClick = { vm.toggleFavorite(movie) }
                                 )
                             }
@@ -112,7 +101,7 @@ object Components {
                 }
             }
 
-            // Диалог / оверлей деталей фильма
+            // 5) Диалог деталей (как раньше) – плавно показываем через AnimatedVisibility
             AnimatedVisibility(
                 visible = (state.selectedMovieDetail != null
                         || state.isDetailLoading
@@ -210,7 +199,7 @@ object Components {
                         Icon(
                             Icons.Filled.Star,
                             contentDescription = "Unfavorite",
-                            tint = Color(0xFFFFD700) // «золотая» звезда
+                            tint = Color(0xFFFFD700)
                         )
                     } else {
                         Icon(
@@ -224,10 +213,6 @@ object Components {
         }
     }
 
-    /**
-     * Диалог с полной информацией о фильме.
-     * Здесь добавлена кнопка «Share» рядом с «Close».
-     */
     @Composable
     private fun MovieDetailDialog(
         detail: MovieDetailModel?,
@@ -237,7 +222,6 @@ object Components {
     ) {
         val context = LocalContext.current
 
-        // Полупрозрачный фон
         Box(
             Modifier
                 .fillMaxSize()
@@ -245,12 +229,10 @@ object Components {
                 .clickable { onDismiss() }
         ) {
             if (isLoading) {
-                // Показ спиннера загрузки
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color.White)
                 }
             } else if (errorMessage != null) {
-                // Показ ошибки
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Card(
                         Modifier
@@ -275,7 +257,6 @@ object Components {
                     }
                 }
             } else if (detail != null) {
-                // Главный контент деталей фильма
                 Card(
                     Modifier
                         .fillMaxWidth(0.9f)
@@ -289,7 +270,6 @@ object Components {
                     shape = MaterialTheme.shapes.large
                 ) {
                     Column(Modifier.padding(16.dp)) {
-                        // Заголовок + кнопки «Close» и «Share»
                         Row(
                             Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
@@ -302,9 +282,7 @@ object Components {
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
-                            // Кнопка Share
                             IconButton(onClick = {
-                                // Формируем ссылку на IMDb
                                 val imdbUrl = "https://www.imdb.com/title/${detail.imdbID}"
                                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
@@ -327,7 +305,6 @@ object Components {
                                 )
                             }
 
-                            // Кнопка Close
                             IconButton(onClick = onDismiss) {
                                 Icon(
                                     Icons.Filled.Close,
@@ -339,7 +316,6 @@ object Components {
 
                         Spacer(Modifier.height(8.dp))
 
-                        // Постер
                         AsyncImage(
                             model = detail.posterUrl,
                             contentDescription = detail.title,
@@ -351,7 +327,6 @@ object Components {
 
                         Spacer(Modifier.height(8.dp))
 
-                        // Строка: год, рейтинг, длительность
                         Text(
                             text = "Year: ${detail.year} • Rating: ${detail.imdbRating
                                 ?: "N/A"} • ${detail.runtime ?: ""}",
@@ -360,7 +335,6 @@ object Components {
                         )
                         Spacer(Modifier.height(8.dp))
 
-                        // Жанр
                         detail.genre?.let {
                             Text(
                                 "Genre: $it",
@@ -370,7 +344,6 @@ object Components {
                             Spacer(Modifier.height(4.dp))
                         }
 
-                        // Синопсис (Plot)
                         detail.plot?.let {
                             Text(
                                 "Plot:",
@@ -385,7 +358,6 @@ object Components {
                             Spacer(Modifier.height(8.dp))
                         }
 
-                        // Режиссёр, сценарист, актёры
                         detail.director?.let {
                             Text(
                                 "Director: $it",
@@ -411,7 +383,6 @@ object Components {
                             Spacer(Modifier.height(8.dp))
                         }
 
-                        // Страна и награды (по желанию)
                         detail.country?.let {
                             Text(
                                 "Country: $it",
