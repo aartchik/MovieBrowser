@@ -3,6 +3,7 @@ package com.example.moviebrowser.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.moviebrowser.model.MovieDetailModel
 import com.example.moviebrowser.model.MovieModel
 import com.example.moviebrowser.repository.FavoritesRepository
 import com.example.moviebrowser.repository.MovieRepository
@@ -13,7 +14,12 @@ data class UiState(
     val movies: List<MovieModel> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val favorites: Set<String> = emptySet()
+    val favorites: Set<String> = emptySet(),
+
+    // ← новое поле: детали текущего выбранного фильма
+    val selectedMovieDetail: MovieDetailModel? = null,
+    val isDetailLoading: Boolean = false,
+    val detailError: String? = null
 )
 
 class MovieViewModel(application: Application) : AndroidViewModel(application) {
@@ -51,5 +57,24 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                 favRepo.addFavorite(movie.imdbID)
             }
         }
+    }
+
+    fun loadMovieDetails(imdbId: String) {
+        viewModelScope.launch {
+            _ui.update { it.copy(isDetailLoading = true, detailError = null) }
+            try {
+                val detail: MovieDetailModel = movieRepo.getDetails(imdbId)
+                _ui.update { it.copy(
+                    selectedMovieDetail = detail,
+                    isDetailLoading     = false
+                ) }
+            } catch (e: Exception) {
+                _ui.update { it.copy(detailError = e.message, isDetailLoading = false) }
+            }
+        }
+    }
+
+    fun clearSelectedDetail() {
+        _ui.update { it.copy(selectedMovieDetail = null, detailError = null) }
     }
 }
