@@ -1,41 +1,38 @@
 package com.example.moviebrowser.repository
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.preferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import androidx.core.content.edit
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-private val Context.dataStore: androidx.datastore.core.DataStore<Preferences> by preferencesDataStore(
-    name = "favorites_prefs"
-)
+class FavoritesRepository(context: Context) {
 
-class FavoritesRepository(private val ctx: Context) {
+    private val prefs = context.getSharedPreferences("favorites_prefs", Context.MODE_PRIVATE)
 
-    companion object {
-        private val FAVORITES_KEY = preferencesKey<Set<String>>("favorites")
+    private val FAVORITES_KEY = "favorites"
 
+    private val _favoritesFlow = MutableStateFlow(loadFavoritesFromPrefs())
+    val favoritesFlow: StateFlow<Set<String>> = _favoritesFlow
+
+    private fun loadFavoritesFromPrefs(): Set<String> {
+        return prefs.getStringSet(FAVORITES_KEY, emptySet()) ?: emptySet()
     }
 
-    val favoritesFlow: Flow<Set<String>> =
-        ctx.dataStore.data.map { prefs ->
-
-            prefs[FAVORITES_KEY] ?: emptySet()
-        }
-
     suspend fun addFavorite(id: String) {
-        ctx.dataStore.edit { prefs ->
-            val oldSet = prefs[FAVORITES_KEY] ?: emptySet()
-            prefs[FAVORITES_KEY] = oldSet + id
+        val currentSet = loadFavoritesFromPrefs().toMutableSet()
+        currentSet.add(id)
+        prefs.edit {
+            putStringSet(FAVORITES_KEY, currentSet)
         }
+        _favoritesFlow.emit(currentSet)
     }
 
     suspend fun removeFavorite(id: String) {
-        ctx.dataStore.edit { prefs ->
-            val oldSet = prefs[FAVORITES_KEY] ?: emptySet()
-            prefs[FAVORITES_KEY] = oldSet - id
+        val currentSet = loadFavoritesFromPrefs().toMutableSet()
+        currentSet.remove(id)
+        prefs.edit {
+            putStringSet(FAVORITES_KEY, currentSet)
         }
+        _favoritesFlow.emit(currentSet)
     }
 }
