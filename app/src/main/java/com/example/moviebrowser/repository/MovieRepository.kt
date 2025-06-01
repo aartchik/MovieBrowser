@@ -21,6 +21,7 @@ class MovieRepository {
         if (resp.response == "True" && resp.results != null) {
             return resp.results.map { it.toModel() }
         } else {
+
             throw Exception(resp.error ?: "Unknown error")
         }
     }
