@@ -65,6 +65,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("androidx.test:core-ktx:1.6.1")
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.0")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -84,4 +85,7 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
 
+    testImplementation("com.google.code.gson:gson:2.10.1")
+
+    testImplementation("org.robolectric:robolectric:4.10.3")
 }
