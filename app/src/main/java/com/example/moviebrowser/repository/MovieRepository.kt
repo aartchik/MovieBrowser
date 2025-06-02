@@ -1,5 +1,7 @@
 package com.example.moviebrowser.repository
 
+import com.example.moviebrowser.model.MovieDetailModel
+import com.example.moviebrowser.model.MovieDetailResponse
 import com.example.moviebrowser.model.MovieModel
 import com.example.moviebrowser.network.OmdbApiService
 import retrofit2.Retrofit
@@ -20,6 +22,15 @@ class MovieRepository {
         val resp = api.searchMovies(query)
         if (resp.response == "True" && resp.results != null) {
             return resp.results.map { it.toModel() }
+        } else {
+            throw Exception(resp.error ?: "Unknown error")
+        }
+    }
+
+    suspend fun getDetails(imdbId: String): MovieDetailModel {
+        val resp: MovieDetailResponse = api.getMovieDetails(imdbId)
+        if (resp.response == "True") {
+            return resp.toModel()
         } else {
             throw Exception(resp.error ?: "Unknown error")
         }
